@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 from todo import todo_router
+from datetime import date
 
 app = FastAPI()
 app.add_middleware(

@@ -43,7 +43,7 @@ async def update_todo(todo: TodoRequest, id: int) -> dict:
     for x in todo_list:
         if x.id == id:
             x.title = todo.title
-            x.description = todo.description
+            x.cls = todo.cls
             return {"message": "Todo updated successfully"}
 
     return {"message": f"The todo with ID={id} is not found."}

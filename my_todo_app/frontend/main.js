@@ -1,8 +1,8 @@
 let titleInput = document.getElementById('title');
-let descInput = document.getElementById('desc');
+let clsInput = document.getElementById('cls');
 let todoId = document.getElementById('todo-id');
 let titleEditInput = document.getElementById('title-edit');
-let descEditInput = document.getElementById('desc-edit');
+let clsEditInput = document.getElementById('cls-edit');
 let todos = document.getElementById('todos');
 let data = [];
 let selectedTodo = {};
@@ -19,7 +19,7 @@ document.getElementById('form-add').addEventListener('submit', (e) => {
   if (!titleInput.value) {
     document.getElementById('msg').innerHTML = 'Todo cannot be blank';
   } else {
-    addTodo(titleInput.value, descInput.value);
+    addTodo(titleInput.value, clsInput.value);
 
     // close modal
     let add = document.getElementById('add');
@@ -31,7 +31,7 @@ document.getElementById('form-add').addEventListener('submit', (e) => {
   }
 });
 
-let addTodo = (title, description) => {
+let addTodo = (title, cls) => {
   const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 201) {
@@ -42,7 +42,7 @@ let addTodo = (title, description) => {
   };
   xhr.open('POST', `${api}/todos`, true);
   xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-  xhr.send(JSON.stringify({ title, description }));
+  xhr.send(JSON.stringify({ title, cls }));
 };
 
 let refreshTodos = () => {
@@ -53,7 +53,7 @@ let refreshTodos = () => {
       return (todos.innerHTML += `
         <div id="todo-${x.id}">
           <span class="fw-bold fs-4">${x.title}</span>
-          <pre class="text-secondary ps-3">${x.description}</pre>
+          <pre class="text-secondary ps-3">${x.cls}</pre>
   
           <span class="options">
             <i onClick="tryEditTodo(${x.id})" data-bs-toggle="modal" data-bs-target="#modal-edit" class="fas fa-edit"></i>
@@ -70,7 +70,7 @@ let tryEditTodo = (id) => {
   selectedTodo = todo;
   todoId.innerText = todo.id;
   titleEditInput.value = todo.title;
-  descEditInput.value = todo.description;
+  clsEditInput.value = todo.cls;
   document.getElementById('msg').innerHTML = '';
 };
 
@@ -80,7 +80,7 @@ document.getElementById('form-edit').addEventListener('submit', (e) => {
   if (!titleEditInput.value) {
     msg.innerHTML = 'Todo cannot be blank';
   } else {
-    editTodo(titleEditInput.value, descEditInput.value);
+    editTodo(titleEditInput.value, classEditInput.value);
 
     // close modal
     let edit = document.getElementById('edit');
@@ -91,18 +91,18 @@ document.getElementById('form-edit').addEventListener('submit', (e) => {
     })();
   }
 });
-let editTodo = (title, description) => {
+let editTodo = (title, cls) => {
   const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
       selectedTodo.title = title;
-      selectedTodo.description = description;
+      selectedTodo.cls = cls;
       refreshTodos();
     }
   };
   xhr.open('PUT', `${api}/todos/${selectedTodo.id}`, true);
   xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-  xhr.send(JSON.stringify({ title, description }));
+  xhr.send(JSON.stringify({ title, cls }));
 };
 
 let deleteTodo = (id) => {
@@ -119,7 +119,7 @@ let deleteTodo = (id) => {
 
 let resetForm = () => {
   titleInput.value = '';
-  descInput.value = '';
+  clsInput.value = '';
 };
 
 let getTodos = () => {

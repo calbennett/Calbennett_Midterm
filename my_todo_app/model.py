@@ -1,12 +1,14 @@
 from pydantic import BaseModel
+from datetime import date
 
 
 class Todo(BaseModel):
     id: int
     title: str
-    description: str
+    cls: str
+    due: date
 
 
 class TodoRequest(BaseModel):
     title: str
-    description: str
+    cls: str
