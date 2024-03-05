@@ -38,27 +38,31 @@ let addTodo = ({ title, cls, due, priority }) => {
     if (xhr.status === 201) {
       const newTodo = JSON.parse(xhr.responseText);
       data.push(newTodo);
+      console.log(newTodo.id, title, cls, due, priority);
       refreshTodos();
     } else {
-      // Handle errors here
+      console.error('Error adding task');
     }
   };
 
   xhr.open('POST', `${api}/todos`, true);
   xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-  xhr.send(JSON.stringify({ title, cls, due }));
+  xhr.send(JSON.stringify({ title, cls, due, priority }));
 };
 
 let refreshTodos = () => {
   todos.innerHTML = '';
+  console.log(data);
   data
-    .sort((a, b) => b.id - a.id)
+  .sort((a, b) => b.id.localeCompare(a.id))
     .map((x) => {
       return (todos.innerHTML += `
         <div id="todo-${x.id}">
           <span class="fw-bold fs-4">${x.title}</span>
           <pre class="text-secondary ps-3">${x.cls}</pre>
-          <pre due="text-secondary ps-3">${x.due}</pre>
+          <pre due="text-secondary ps-3">Due ${x.due}</pre>
+          <pre priority="text-secondary ps-3>Priority: ${x.priority}</pre>
+
   
           <span class="options">
             <i onClick="tryEditTodo(${x.id})" data-bs-toggle="modal" data-bs-target="#modal-edit" class="fas fa-edit"></i>
@@ -78,6 +82,7 @@ let tryEditTodo = (id) => {
   clsEditInput.value = todo.cls;
   priorityEditInput.value = todo.priority;
   document.getElementById('msg').innerHTML = '';
+  console.log('Todo with id ', id, ' updated')
 };
 
 document.getElementById('form-edit').addEventListener('submit', (e) => {
@@ -86,7 +91,7 @@ document.getElementById('form-edit').addEventListener('submit', (e) => {
   if (!titleEditInput.value) {
     msg.innerHTML = 'Todo cannot be blank';
   } else {
-    editTodo(titleEditInput.value, classEditInput.value);
+    editTodo(titleEditInput.value, clsEditInput.value, dueEditInput.value, priorityEditInput.value);
 
     // close modal
     let edit = document.getElementById('edit');
@@ -97,12 +102,14 @@ document.getElementById('form-edit').addEventListener('submit', (e) => {
     })();
   }
 });
-let editTodo = (title, cls) => {
+let editTodo = (title, cls, due, priority) => {
   const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
       selectedTodo.title = title;
       selectedTodo.cls = cls;
+      selectedTodo.due = due;
+      selectedTodo.priority = priority;
       refreshTodos();
     }
   };
@@ -112,11 +119,16 @@ let editTodo = (title, cls) => {
 };
 
 let deleteTodo = (id) => {
+  console.log("Attempting to delete todo")
   const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = () => {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      data = data.filter((x) => x.id !== id);
-      refreshTodos();
+    console.log(`XHR ReadyState: ${xhr.readyState}, Status: ${xhr.status}`);
+    if (xhr.readyState == 4) {
+      console.log(`Response Text: ${xhr.responseText}`);
+      if (xhr.status == 200) {
+        data = data.filter((x) => x.id !== id);
+        refreshTodos();
+      }
     }
   };
   xhr.open('DELETE', `${api}/todos/${id}`, true);

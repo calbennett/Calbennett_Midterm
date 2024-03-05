@@ -14,9 +14,9 @@ max_id: int = 0
 @todo_router.post("/todos", status_code=status.HTTP_201_CREATED)
 async def add_todo(todo: TodoRequest) -> dict:
     global max_id
-    max_id += 1  # auto increment ID
 
-    newTodo = Todo(id=str(uuid.uuid4()), title=todo.title, cls=todo.cls, due=todo.due, priority=todo.priority)
+    newTodo = Todo(id=max_id, title=todo.title, cls=todo.cls, due=todo.due, priority=todo.priority)
+    max_id += 1
     todo_list.append(newTodo)
     json_compatible_item_data = newTodo.model_dump()
     return JSONResponse(json_compatible_item_data, status_code=status.HTTP_201_CREATED)
@@ -47,6 +47,7 @@ async def update_todo(id: str, todo: TodoRequest) -> dict:
             x.title = todo.title
             x.cls = todo.cls
             x.due = todo.due  # Assuming 'due' is a field in the Todo model
+            x.priority = todo.priority
             return {"message": "Todo updated successfully"}
 
     raise HTTPException(

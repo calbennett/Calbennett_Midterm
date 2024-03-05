@@ -4,7 +4,7 @@ from datetime import date
 
 
 class Todo(BaseModel):
-    id: str
+    id: int
     title: str
     cls: str
     due: Optional[str]
