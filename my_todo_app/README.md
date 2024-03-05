@@ -85,7 +85,7 @@ The next step is to start our application using uvicorn. In your terminal, run t
 following command:
 
 ```powershell
-(venv)$ uvicorn main:app --port 8000 --reload
+(venv)$ uvicorn main:app --port 5173 --reload
 ```
 
 In the preceding command, uvicorn takes the following arguments:

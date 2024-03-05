@@ -3,10 +3,14 @@ let clsInput = document.getElementById('cls');
 let todoId = document.getElementById('todo-id');
 let titleEditInput = document.getElementById('title-edit');
 let clsEditInput = document.getElementById('cls-edit');
+let dueInput = document.getElementById('due');
+let dueEditInput = document.getElementById('due-edit');
+let priorityInput = document.getElementById('priority');
+let priorityEditInput = document.getElementById('priority-edit');
 let todos = document.getElementById('todos');
 let data = [];
 let selectedTodo = {};
-const api = 'http://localhost:8000';
+const api = 'http://localhost:5173';
 
 function tryAdd() {
   let msg = document.getElementById('msg');
@@ -17,32 +21,32 @@ document.getElementById('form-add').addEventListener('submit', (e) => {
   e.preventDefault();
 
   if (!titleInput.value) {
-    document.getElementById('msg').innerHTML = 'Todo cannot be blank';
+    document.getElementById('msg').innerHTML = 'Name cannot be blank';
   } else {
-    addTodo(titleInput.value, clsInput.value);
-
-    // close modal
-    let add = document.getElementById('add');
-    add.setAttribute('data-bs-dismiss', 'modal');
-    add.click();
-    (() => {
-      add.setAttribute('data-bs-dismiss', '');
-    })();
+    addTodo({
+      title: titleInput.value,
+      cls: clsInput.value,
+      due: dueInput.value,
+      priority: priorityInput.value
+    });
   }
 });
 
-let addTodo = (title, cls) => {
+let addTodo = ({ title, cls, due, priority }) => {
   const xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = () => {
-    if (xhr.readyState == 4 && xhr.status == 201) {
+  xhr.onload = () => {
+    if (xhr.status === 201) {
       const newTodo = JSON.parse(xhr.responseText);
       data.push(newTodo);
       refreshTodos();
+    } else {
+      // Handle errors here
     }
   };
+
   xhr.open('POST', `${api}/todos`, true);
   xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-  xhr.send(JSON.stringify({ title, cls }));
+  xhr.send(JSON.stringify({ title, cls, due }));
 };
 
 let refreshTodos = () => {
@@ -54,6 +58,7 @@ let refreshTodos = () => {
         <div id="todo-${x.id}">
           <span class="fw-bold fs-4">${x.title}</span>
           <pre class="text-secondary ps-3">${x.cls}</pre>
+          <pre due="text-secondary ps-3">${x.due}</pre>
   
           <span class="options">
             <i onClick="tryEditTodo(${x.id})" data-bs-toggle="modal" data-bs-target="#modal-edit" class="fas fa-edit"></i>
@@ -71,6 +76,7 @@ let tryEditTodo = (id) => {
   todoId.innerText = todo.id;
   titleEditInput.value = todo.title;
   clsEditInput.value = todo.cls;
+  priorityEditInput.value = todo.priority;
   document.getElementById('msg').innerHTML = '';
 };
 
@@ -120,6 +126,7 @@ let deleteTodo = (id) => {
 let resetForm = () => {
   titleInput.value = '';
   clsInput.value = '';
+  dueInput.value = ''
 };
 
 let getTodos = () => {

@@ -2,10 +2,12 @@ from fastapi import APIRouter, Path, HTTPException, status
 from model import Todo, TodoRequest
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from typing import List
+import uuid
 
 todo_router = APIRouter()
 
-todo_list = []
+todo_list: List[Todo] = []
 max_id: int = 0
 
 
@@ -14,7 +16,7 @@ async def add_todo(todo: TodoRequest) -> dict:
     global max_id
     max_id += 1  # auto increment ID
 
-    newTodo = Todo(id=max_id, title=todo.title, description=todo.description)
+    newTodo = Todo(id=str(uuid.uuid4()), title=todo.title, cls=todo.cls, due=todo.due, priority=todo.priority)
     todo_list.append(newTodo)
     json_compatible_item_data = newTodo.model_dump()
     return JSONResponse(json_compatible_item_data, status_code=status.HTTP_201_CREATED)
@@ -27,7 +29,7 @@ async def get_todos() -> dict:
 
 
 @todo_router.get("/todos/{id}")
-async def get_todo_by_id(id: int = Path(..., title="default")) -> dict:
+async def get_todo_by_id(id: str = Path(..., title="default")) -> dict:
     for todo in todo_list:
         if todo.id == id:
             return {"todo": todo}
@@ -39,22 +41,16 @@ async def get_todo_by_id(id: int = Path(..., title="default")) -> dict:
 
 
 @todo_router.put("/todos/{id}")
-async def update_todo(todo: TodoRequest, id: int) -> dict:
+async def update_todo(id: str, todo: TodoRequest) -> dict:
     for x in todo_list:
         if x.id == id:
             x.title = todo.title
             x.cls = todo.cls
+            x.due = todo.due  # Assuming 'due' is a field in the Todo model
             return {"message": "Todo updated successfully"}
 
-    return {"message": f"The todo with ID={id} is not found."}
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"The todo with ID={id} is not found.",
+    )
 
-
-@todo_router.delete("/todos/{id}")
-async def delete_todo(id: int) -> dict:
-    for i in range(len(todo_list)):
-        todo = todo_list[i]
-        if todo.id == id:
-            todo_list.pop(i)
-            return {"message": f"The todo with ID={id} has been deleted."}
-
-    return {"message": f"The todo with ID={id} is not found."}
