@@ -8,7 +8,7 @@ class Todo(BaseModel):
     title: str
     cls: str
     due: Optional[str]
-    priority: Optional[int]
+    priority: Optional[str]
 
 
 
@@ -16,4 +16,4 @@ class TodoRequest(BaseModel):
     title: str
     cls: str
     due: Optional[str]
-    priority: Optional[int]
+    priority: Optional[str]
