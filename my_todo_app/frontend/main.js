@@ -181,7 +181,7 @@ let deleteTodo = (id) => {
       }
     }
   };
-  xhr.open('DELETE', `${api}/todos/${id}`, true);
+  xhr.open('DELETE', `${api}/todos/${selectedTodo.id}`, true)
   xhr.send();
 };
 

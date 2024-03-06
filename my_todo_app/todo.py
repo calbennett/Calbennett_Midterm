@@ -3,7 +3,6 @@ from model import Todo, TodoRequest
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import List
-import uuid
 
 todo_router = APIRouter()
 
@@ -62,6 +61,26 @@ async def update_todo(id: int, todo: TodoRequest) -> dict:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"The todo with ID={id} is not found.",
         )
+    except Exception as e:
+        print(f"Error processing request: {e}")
+        return {"error": str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR
+
+@todo_router.delete("/todos/{id}")
+async def delete_todo(id: int) -> dict:
+    try:
+        # Use a list comprehension to filter out the todo with the given ID
+        deleted_todo = [todo for todo in todo_list if todo.id == id]
+        
+        if not deleted_todo:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"The todo with ID={id} is not found.",
+            )
+        
+        # Remove the todo from the todo_list
+        todo_list.remove(deleted_todo[0])
+
+        return {"message": f"Todo with ID={id} deleted successfully"}
     except Exception as e:
         print(f"Error processing request: {e}")
         return {"error": str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR
