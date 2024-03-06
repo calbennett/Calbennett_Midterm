@@ -29,7 +29,7 @@ async def get_todos() -> dict:
 
 
 @todo_router.get("/todos/{id}")
-async def get_todo_by_id(id: str = Path(..., title="default")) -> dict:
+async def get_todo_by_id(id: int = Path(..., title="default")) -> dict:
     for todo in todo_list:
         if todo.id == id:
             return {"todo": todo}
@@ -41,17 +41,27 @@ async def get_todo_by_id(id: str = Path(..., title="default")) -> dict:
 
 
 @todo_router.put("/todos/{id}")
-async def update_todo(id: str, todo: TodoRequest) -> dict:
-    for x in todo_list:
-        if x.id == id:
-            x.title = todo.title
-            x.cls = todo.cls
-            x.due = todo.due  # Assuming 'due' is a field in the Todo model
-            x.priority = todo.priority
-            return {"message": "Todo updated successfully"}
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"The todo with ID={id} is not found.",
-    )
-
+async def update_todo(id: int, todo: TodoRequest) -> dict:
+    print(id)
+    try:
+        for x in todo_list:
+            print(x.id)
+            if x.id == id:
+                print(f"Received data: {todo}")
+                x.title = todo.title
+                x.cls = todo.cls
+                x.due = todo.due
+                x.priority = todo.priority
+                updatedTodo = Todo(id=x.id, title=x.title, cls=x.cls, due=x.due, priority=x.priority)
+                for i, x in enumerate(todo_list):
+                    if x.id == id:
+                        todo_list[i] = updatedTodo
+                return {"message": "Todo found"}
+        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"The todo with ID={id} is not found.",
+        )
+    except Exception as e:
+        print(f"Error processing request: {e}")
+        return {"error": str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR

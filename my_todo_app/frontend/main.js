@@ -1,16 +1,14 @@
 let titleInput = document.getElementById('title');
 let clsInput = document.getElementById('cls');
 let todoId = document.getElementById('todo-id');
-let titleEditInput = document.getElementById('title-edit');
-let clsEditInput = document.getElementById('cls-edit');
 let dueInput = document.getElementById('due');
-let dueEditInput = document.getElementById('due-edit');
 let priorityInput = document.getElementById('priority');
-let priorityEditInput = document.getElementById('priority-edit');
+let titleEditInput, clsEditInput, dueEditInput, priorityEditInput; // Declare these variables here
+
 let todos = document.getElementById('todos');
 let data = [];
 let selectedTodo = {};
-const api = 'http://localhost:5173';
+const api = 'http://127.0.0.1:5173';
 
 function tryAdd() {
   let msg = document.getElementById('msg');
@@ -32,7 +30,37 @@ document.getElementById('form-add').addEventListener('submit', (e) => {
   }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize these variables inside the event listener
+  titleEditInput = document.getElementById('title-edit');
+  clsEditInput = document.getElementById('cls-edit');
+  dueEditInput = document.getElementById('due-edit');
+  priorityEditInput = document.getElementById('priority-edit');
+
+  document.getElementById('form-edit').addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const msg = document.getElementById('msg');
+
+    if (!titleEditInput.value) {
+      msg.innerHTML = 'Todo cannot be blank';
+    } else {
+      editTodo({
+        title: titleEditInput.value,
+        cls: clsEditInput.value,
+        due: dueEditInput.value,
+        priority: priorityEditInput.value
+      });
+
+      let edit = document.getElementById('edit');
+      edit.setAttribute('data-bs-dismiss', 'modal');
+      edit.click();
+    }
+  })});
+
+
 let addTodo = ({ title, cls, due, priority }) => {
+  const xhr = new XMLHttpRequest();
   fetch(`${api}/todos`, {
     method: 'POST',
     headers: {
@@ -68,14 +96,15 @@ let refreshTodos = () => {
         <div id="todo-${x.id}">
           <span class="fw-bold fs-4">${x.title}</span>
           <pre class="text-secondary ps-3">${x.cls}</pre>
-          <pre due="text-secondary ps-3">Due ${x.due}</pre>
-          <pre priority="text-secondary ps-3>Priority: ${x.priority}</pre>
+          <pre class="text-secondary ps-3">Due ${x.due}</pre>
+          <pre class="text-secondary ps-3">Priority: ${x.priority}</pre>
 
   
           <span class="options">
             <i onClick="tryEditTodo(${x.id})" data-bs-toggle="modal" data-bs-target="#modal-edit" class="fas fa-edit"></i>
             <i onClick="deleteTodo(${x.id})" class="fas fa-trash-alt"></i>
           </span>
+
         </div>
     `);
     });
@@ -88,29 +117,38 @@ let tryEditTodo = (id) => {
   todoId.innerText = todo.id;
   titleEditInput.value = todo.title;
   clsEditInput.value = todo.cls;
+  dueEditInput.value = todo.due;
   priorityEditInput.value = todo.priority;
   document.getElementById('msg').innerHTML = '';
-  console.log('Todo with id ', id, ' updated')
+  console.log('Todo with id ', id, todo.title, todo.cls, todo.due, todo.priority, ' updated')
 };
 
 document.getElementById('form-edit').addEventListener('submit', (e) => {
   e.preventDefault();
 
+  const titleEditInput = document.getElementById('titleEditInput');
+  const clsEditInput = document.getElementById('clsEditInput');
+  const dueEditInput = document.getElementById('dueEditInput');
+  const priorityEditInput = document.getElementById('priorityEditInput');
+  const msg = document.getElementById('msg');
+
   if (!titleEditInput.value) {
     msg.innerHTML = 'Todo cannot be blank';
-  } else {
-    editTodo(titleEditInput.value, clsEditInput.value, dueEditInput.value, priorityEditInput.value);
-
-    // close modal
+  } 
+  else {
+    editTodo({
+      title: titleEditInput.value,
+      cls: clsEditInput.value,
+      due: dueEditInput.value,
+      priority: priorityEditInput.value
+    });
+    
     let edit = document.getElementById('edit');
     edit.setAttribute('data-bs-dismiss', 'modal');
     edit.click();
-    (() => {
-      edit.setAttribute('data-bs-dismiss', '');
-    })();
   }
-});
-let editTodo = (title, cls, due, priority) => {
+  });
+let editTodo = ({title, cls, due, priority}) => {
   const xhr = new XMLHttpRequest();
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
@@ -121,9 +159,13 @@ let editTodo = (title, cls, due, priority) => {
       refreshTodos();
     }
   };
+  console.log('Attempting to edit');
   xhr.open('PUT', `${api}/todos/${selectedTodo.id}`, true);
+  console.log('Attempting to edit2');
   xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-  xhr.send(JSON.stringify({ title, cls }));
+  console.log('Attempting to edit3');
+  xhr.send(JSON.stringify({ title, cls, due, priority }));
+  console.log('Attempting to edit4');
 };
 
 let deleteTodo = (id) => {
