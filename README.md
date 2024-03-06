@@ -1,7 +1,10 @@
 # Calbennett_Midterm
-An application to track assignments for each of one's classes, and set due dates and priority.
+An application to track the classes, due dates,
+and priority levels of assignments.
 ![alt text](https://github.com/calbennett/Calbennett_Midterm/blob/main/home.PNG)
 
-Adding assignments:
-![alt text](https://github.com/calbennett/Calbennett_Midterm/blob/main/Input1.PNG)
+## Adding Assignments
+![alt text](https://github.com/calbennett/Calbennett_Midterm/blob/main/Input2.PNG)
 
+## Editing Assignments
+![alt text](https://github.com/calbennett/Calbennett_Midterm/blob/main/Input1.PNG)
