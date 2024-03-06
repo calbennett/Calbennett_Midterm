@@ -33,17 +33,25 @@ document.getElementById('form-add').addEventListener('submit', (e) => {
 });
 
 let addTodo = ({ title, cls, due, priority }) => {
-  const xhr = new XMLHttpRequest();
-  xhr.onload = () => {
-    if (xhr.status === 201) {
-      const newTodo = JSON.parse(xhr.responseText);
-      data.push(newTodo);
-      console.log(newTodo.id, title, cls, due, priority);
-      refreshTodos();
-    } else {
-      console.error('Error adding task');
+  fetch(`${api}/todos`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ title, cls, due, priority }),
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-  };
+    return response.json();
+  })
+  .then(newTodo => {
+    data.push(newTodo);
+    console.log(newTodo.id, title, cls, due, priority);
+    refreshTodos();
+  })
+  .catch(error => console.error('Error adding task', error));
 
   xhr.open('POST', `${api}/todos`, true);
   xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
@@ -54,7 +62,7 @@ let refreshTodos = () => {
   todos.innerHTML = '';
   console.log(data);
   data
-  .sort((a, b) => b.id.localeCompare(a.id))
+  .sort((a, b) => b.id - a.id)
     .map((x) => {
       return (todos.innerHTML += `
         <div id="todo-${x.id}">
