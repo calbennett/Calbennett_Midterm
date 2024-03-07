@@ -14,7 +14,7 @@ body {
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  border: 0.25rem solid #abcea1;
+  border: 0.25rem solid blue;
   border-radius: 0.5rem;
   padding: 1rem;
   overflow-y: auto;
@@ -24,14 +24,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgba(171, 206, 161, 0.35);
+  background-color: white;
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
 }
 
 .fa-plus {
-  background-color: #abcea1;
+  background-color: blue;
   padding: 3px;
   border-radius: 3px;
 }
@@ -45,8 +45,8 @@ body {
 }
 
 #todos div {
-  border: 3px solid #abcea1;
-  background-color: #e2eede;
+  border: 3px solid blue;
+  background-color: white;
   border-radius: 6px;
   padding: 5px;
   display: grid;
